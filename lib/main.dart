@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         ),
         primarySwatch: Colors.amber,
       ),
-      home: const HomePage(),
+      home:  const HomePage(),
     );
   }
 }

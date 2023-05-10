@@ -1,10 +1,8 @@
 import 'package:conversor_de_moedas/main.dart';
+import 'package:conversor_de_moedas/view/textfield.dart';
 import 'package:flutter/material.dart';
 // ignore: import_of_legacy_library_into_null_safe, unused_import
 import 'package:http/http.dart';
-import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 const request = "https://api.hgbrasil.com/finance?key=6b8fbd4d";
 
@@ -16,8 +14,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  double? dolar;
-  double? euro;
+  final realController = TextEditingController();
+  final euroController = TextEditingController();
+  final dolarController = TextEditingController();
+  double dolar = 0;
+  double euro = 0;
+
+  void _realChanged(String text) {
+    if (text.isEmpty) {
+      dolarController.text = "";
+      euroController.text = "";
+      return;
+    }
+    double real = double.parse(text);
+
+    dolarController.text = (real / dolar).toStringAsFixed(2);
+    euroController.text = (real / euro).toStringAsFixed(2);
+  }
+
+  void _dolarChanged(String text) {
+    if (text.isEmpty) {
+      realController.text = "";
+      euroController.text = "";
+      return;
+    }
+    double dolar = double.parse(text);
+
+    realController.text = (dolar * this.dolar).toStringAsFixed(2);
+    euroController.text = (dolar * this.dolar / euro).toStringAsFixed(2);
+  }
+
+  void _euroChanged(String text) {
+    if (text.isEmpty) {
+      realController.text = "";
+      dolarController.text = "";
+      return;
+    }
+    double euro = double.parse(text);
+    realController.text = (euro * this.euro).toStringAsFixed(2);
+    dolarController.text = (euro * this.euro / dolar).toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,50 +101,31 @@ class _HomePageState extends State<HomePage> {
                           const EdgeInsets.only(top: 30, right: 20, left: 20),
                       child: Center(
                         child: Column(
-                          children: const [
-                            Icon(
+                          children: [
+                            const Icon(
                               Icons.monetization_on,
                               color: Colors.amber,
-                              size: 100,
+                              size: 150,
                             ),
-                            SizedBox(
-                              height: 10,
+                            const SizedBox(
+                              height: 100,
                             ),
                             //Reais
-                            TextField(
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: "Reais",
-                                labelStyle: TextStyle(color: Colors.amber),
-                              ),
-                              style: TextStyle(color: Colors.amber),
-                            ),
-                            SizedBox(
+                            buildTextField(
+                                "Reais", "R\$", realController, _realChanged),
+
+                            const SizedBox(
                               height: 10,
                             ),
 
-                            TextField(
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: "Dólares",
-                                labelStyle: TextStyle(color: Colors.amber),
-                              ),
-                              style: TextStyle(color: Colors.amber),
-                            ),
-                            SizedBox(
+                            buildTextField("Dólares", "US\$", dolarController,
+                                _dolarChanged),
+
+                            const SizedBox(
                               height: 10,
                             ),
-                            TextField(
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: "Euros",
-                                labelStyle: TextStyle(color: Colors.amber),
-                              ),
-                              style: TextStyle(color: Colors.amber),
-                            ),
+                            buildTextField(
+                                "Euros", "€", euroController, _euroChanged),
                           ],
                         ),
                       ),
